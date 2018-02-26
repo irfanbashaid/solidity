@@ -1,0 +1,65 @@
+//solidity program for voting three candidates
+pragma solidity ^0.4.0;
+contract Electionprocess
+{
+    uint256[] arrforcan;
+    uint256 can_count;
+    struct candidates 
+    {
+        uint256 votes;
+        bool iscandidate;
+    }
+    mapping(uint256=>candidates)candidate_map;
+    struct voters
+    {
+        bool isvoter;
+    }
+    mapping(uint256=>voters)voter_map;
+    modifier check_can(uint256 _can)
+    {
+        require(candidate_map[_can].iscandidate==false);
+        require(arrforcan.length<3);
+        _;
+    }
+    modifier check_whotovote(uint256 _vid,uint256 _whotovote)
+    {
+        require(candidate_map[_whotovote].iscandidate==true);
+        require(voter_map[_vid].isvoter==false);
+        _;
+    }
+    function addcandidate(uint256 can) check_can(can)
+    {
+        candidate_map[can].iscandidate=true;
+        arrforcan.push(can);
+    }
+    function voting(uint256 vid,uint whotovote) check_whotovote(vid,whotovote)
+    {
+        candidate_map[whotovote].votes+=1;
+        voter_map[vid].isvoter=true;
+    }
+    function result() constant returns(uint256 winner,uint256 winnervotes,uint256 runner,uint256 runnervotes)
+    {
+        if((candidate_map[arrforcan[0]].votes>candidate_map[arrforcan[1]].votes)&&(candidate_map[arrforcan[0]].votes>candidate_map[arrforcan[2]].votes))
+        {
+            if(candidate_map[arrforcan[1]].votes>candidate_map[arrforcan[2]].votes)
+            return (arrforcan[0],candidate_map[arrforcan[0]].votes,arrforcan[1],candidate_map[arrforcan[1]].votes);
+            else
+            return (arrforcan[0],candidate_map[arrforcan[0]].votes,arrforcan[2],candidate_map[arrforcan[2]].votes);
+        }
+        if((candidate_map[arrforcan[1]].votes>candidate_map[arrforcan[2]].votes)&&(candidate_map[arrforcan[1]].votes>candidate_map[arrforcan[0]].votes))
+        {
+            if(candidate_map[arrforcan[2]].votes>candidate_map[arrforcan[0]].votes)
+            return (arrforcan[1],candidate_map[arrforcan[1]].votes,arrforcan[2],candidate_map[arrforcan[2]].votes);
+            else
+            return (arrforcan[1],candidate_map[arrforcan[1]].votes,arrforcan[0],candidate_map[arrforcan[0]].votes);
+        }
+        if((candidate_map[arrforcan[2]].votes>candidate_map[arrforcan[0]].votes)&&(candidate_map[arrforcan[2]].votes>candidate_map[arrforcan[1]].votes))
+        {
+            if(candidate_map[arrforcan[0]].votes>candidate_map[arrforcan[1]].votes)
+            return (arrforcan[2],candidate_map[arrforcan[2]].votes,arrforcan[0],candidate_map[arrforcan[0]].votes);
+            else
+            return (arrforcan[2],candidate_map[arrforcan[2]].votes,arrforcan[1],candidate_map[arrforcan[1]].votes);
+        }
+        
+    }
+}
