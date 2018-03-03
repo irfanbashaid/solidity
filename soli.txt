@@ -3,26 +3,24 @@ contract ERC20_Bank_wallet
 {
     event Approval(address owner, address spender,uint256 amount);
     event Transfer(address from, address to, uint256 amount);
-    struct acc_details
+    
+    mapping(address=>uint)acc;
+    mapping(address=>mapping(address=>uint))spender_map;
+    function totalSupply(uint256 amount) returns (uint256)
     {
-        uint256 balance;
+        acc[msg.sender]=amount;
+        return acc[msg.sender];
     }
-    mapping(address=>acc_details)acc;
-    mapping(address=>mapping(address=>acc_details))spender_map;
-    function totalSupply(uint256 amount) returns (uint256 balance)
+    function balanceOf(address acc_holder) public constant returns (uint256) 
     {
-        acc[msg.sender].balance=amount;
-    }
-    function balanceOf(address acc_holder) returns (uint256 balance) 
-    {
-        return acc[acc_holder].balance;
+        return acc[acc_holder];
     }
     function transfer(address transfer_to, uint256 amount) returns (bool) 
     {
-        if(acc[msg.sender].balance>amount)
+        if(acc[msg.sender]>amount)
         {
-            acc[transfer_to].balance+=amount;
-            acc[msg.sender].balance-=amount;
+            acc[transfer_to]+=amount;
+            acc[msg.sender]-=amount;
             Transfer(msg.sender,transfer_to,amount);
             return true;
         }
@@ -31,9 +29,9 @@ contract ERC20_Bank_wallet
     }
     function approve(address spender, uint256 amount) returns (bool)
     {
-        if(acc[msg.sender].balance>amount)
+        if(acc[msg.sender]>amount)
         {
-            spender_map[msg.sender][spender].balance=amount;
+            spender_map[msg.sender][spender]=amount;
             Approval(msg.sender,spender,amount);
             return true;
         }
@@ -42,19 +40,19 @@ contract ERC20_Bank_wallet
     }
     function transferFrom(address spender, address transfer_to, uint256 amount) returns (bool) 
     {
-        if(spender_map[msg.sender][spender].balance>amount)
+        if(spender_map[msg.sender][spender]>amount)
         {
-            acc[transfer_to].balance+=amount;
-            spender_map[msg.sender][spender].balance-=amount;
-            acc[msg.sender].balance-=amount;
+            acc[transfer_to]+=amount;
+            spender_map[msg.sender][spender]-=amount;
+            acc[msg.sender]-=amount;
             Transfer(spender,transfer_to,amount);
             return true;
         }
         else
             return false;
     }
-    function allowance(address spender) returns (uint256) 
+    function allowance(address spender) public constant returns (uint256) 
     {
-        return spender_map[msg.sender][spender].balance;
+        return spender_map[msg.sender][spender];
     }
 }
