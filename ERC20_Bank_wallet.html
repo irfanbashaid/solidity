@@ -318,7 +318,7 @@
 	}
 	function spe_bal(){
 		var j=document.getElementById("spe_ad").value;
-		walleton.approve(j,function(error,result){
+		walleton.allowance(j,function(error,result){
             	if (!error) 
 		{
               	alert(result);
@@ -328,8 +328,7 @@
              	console.error(error);
 		}
 	    });
-
 	}
 		
 </script>
-</html>
+</html> 
