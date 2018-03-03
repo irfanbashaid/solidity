@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html> 
 <head>
+<script src="web3.min.js"></script>
 <meta charset="utf-8">
 <title>Bank wallet</title>
-<script src="web3.min.js"></script>
 </head>
 <body bgcolor=AliceBlue>
  <center>
@@ -33,15 +33,53 @@
   <input id="t3amount" type="text" placeholder="Amount"/>
   <input type="button" onclick="transfer2()" value="Transfer">
 
-  <p><h2>Spender balance<h2></p>
+  <p><h2>Spender balance</h2></p>
   <input id="spe_ad" type="text" placeholder="Spender Address"/>
-  <input type="button" onclick="spe_bal()" value="Transfer">
+  <input type="button" onclick="spe_bal()" value="check">
 
  </center>
 </body>
 <script>
 	web3.eth.defaultAccount = web3.eth.accounts[0];
         var wallet= web3.eth.contract([
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "acc_holder",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "spender",
+				"type": "address"
+			}
+		],
+		"name": "allowance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
 	{
 		"anonymous": false,
 		"inputs": [
@@ -92,25 +130,6 @@
 			{
 				"name": "spender",
 				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "spender",
-				"type": "address"
 			},
 			{
 				"name": "amount",
@@ -132,25 +151,6 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "acc_holder",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"name": "balance",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
 				"name": "amount",
 				"type": "uint256"
 			}
@@ -158,7 +158,7 @@
 		"name": "totalSupply",
 		"outputs": [
 			{
-				"name": "balance",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -217,7 +217,7 @@
 		"type": "function"
 	}
 ]);
-	var walleton= wallet.at('0x26ed2aeacccfbc8e9b5aa608bc895b6db1acdffa');
+	var walleton= wallet.at('0xf62e7daea7c933a084b50ebdfc4ada259de7fb3c');
 	
 	if(!web3.isConnected()) {
   	console.log("Ok....");
@@ -247,7 +247,6 @@
                 console.log('This is an unknown network.')
             }
         })
-
 	function deposit(){
 		var a=document.getElementById("d_am").value;
 		walleton.totalSupply(a,function(error,result){
@@ -261,7 +260,6 @@
 		}
 	    });
 	}
-
 	function balance(){
 		var b=document.getElementById("acc_holder").value;
 		walleton.balanceOf(b,function(error,result){
@@ -275,7 +273,6 @@
 		}
 	    });
 	}
-
 	function transfer1(){
 		var c=document.getElementById("transferto").value;
 		var d=document.getElementById("t1amount").value;
@@ -290,7 +287,6 @@
 		}
 	    });
 	}
-
 	function fixspender(){
 		var e=document.getElementById("spender").value;
 		var f=document.getElementById("t2amount").value;
@@ -305,11 +301,10 @@
 		}
 	    });
 	}
-
 	function transfer2(){
 		var g=document.getElementById("spen_ad").value;
 		var h=document.getElementById("rec_ad").value;	
-		var i=document.getElementById("t2amount").value;
+		var i=document.getElementById("t3amount").value;
 		walleton.transferFrom(g,h,i,function(error,result){
             	if (!error) 
 		{
@@ -321,7 +316,6 @@
 		}
 	    });
 	}
-
 	function spe_bal(){
 		var j=document.getElementById("spe_ad").value;
 		walleton.approve(j,function(error,result){
@@ -334,6 +328,7 @@
              	console.error(error);
 		}
 	    });
+
 	}
 		
 </script>
