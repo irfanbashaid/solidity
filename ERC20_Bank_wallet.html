@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html> 
+<head>
+<meta charset="utf-8">
+<title>Bank wallet</title>
+<script src="web3.min.js"></script>
+</head>
+<body bgcolor=AliceBlue>
+ <center>
+  <h1>Bank Wallet</h1>
+  
+  <p><h2>Deposit</h2></p>
+  <input id="d_am" type="text" placeholder="Deposit-amount"/>
+  <input type="button" onclick="deposit()" value="Deposit"/> 
+
+  <p><h2>Wallet balance</h2></p>
+  <input id="acc_holder" type="text" placeholder="Acc_holder_address"/>
+  <input type="button" onclick="balance()" value="balance">
+
+  <p><h2>Transfer Amount</h2></p>
+  <input id="transferto" type="text" placeholder="Receiver address"/>
+  <input id="t1amount" type="text" placeholder="Amount"/>
+  <input type="button" onclick="transfer1()" value="Transfer">
+
+  <p><h2>Approve Spender</h2></p>
+  <input id="spender" type="text" placeholder="spender address"/>
+  <input id="t2amount" type="text" placeholder="Amount"/>
+  <input type="button" onclick="fixspender()" value="Create Spender">
+
+  <p><h2>Spender Transfer</h2></p>
+  <input id="spen_ad" type="text" placeholder="spender address"/>
+  <input id="rec_ad" type="text" placeholder="Receiver address"/>
+  <input id="t3amount" type="text" placeholder="Amount"/>
+  <input type="button" onclick="transfer2()" value="Transfer">
+
+  <p><h2>Spender balance<h2></p>
+  <input id="spe_ad" type="text" placeholder="Spender Address"/>
+  <input type="button" onclick="spe_bal()" value="Transfer">
+
+ </center>
+</body>
+<script>
+	web3.eth.defaultAccount = web3.eth.accounts[0];
+        var wallet= web3.eth.contract([
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "spender",
+				"type": "address"
+			}
+		],
+		"name": "allowance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "acc_holder",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"name": "balance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "totalSupply",
+		"outputs": [
+			{
+				"name": "balance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "transfer_to",
+				"type": "address"
+			},
+			{
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "transfer",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"name": "transfer_to",
+				"type": "address"
+			},
+			{
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]);
+	var walleton= wallet.at('0x26ed2aeacccfbc8e9b5aa608bc895b6db1acdffa');
+	
+	if(!web3.isConnected()) {
+  	console.log("Ok....");
+        } 
+	else {
+        console.log("no");
+      	}
+      	
+	web3.version.getNetwork((err, netId) => {
+            switch (netId) {
+              case "1":
+                console.log('This is mainnet')
+                break
+              case "2":
+                console.log('This is the deprecated Morden test network.')
+                break
+              case "3":
+                console.log('This is the ropsten test network.')
+                break
+              case "4":
+                console.log('This is the Rinkeby test network.')
+                break
+              case "42":
+                console.log('This is the Kovan test network.')
+                break
+              default:
+                console.log('This is an unknown network.')
+            }
+        })
+
+	function deposit(){
+		var a=document.getElementById("d_am").value;
+		walleton.totalSupply(a,function(error,result){
+            	if (!error) 
+		{
+              	alert(result);
+                }   
+		else 
+		{
+             	console.error(error);
+		}
+	    });
+	}
+
+	function balance(){
+		var b=document.getElementById("acc_holder").value;
+		walleton.balanceOf(b,function(error,result){
+            	if (!error) 
+		{
+              	alert(result);
+                }   
+		else 
+		{
+             	console.error(error);
+		}
+	    });
+	}
+
+	function transfer1(){
+		var c=document.getElementById("transferto").value;
+		var d=document.getElementById("t1amount").value;
+		walleton.transfer(c,d,function(error,result){
+            	if (!error) 
+		{
+              	alert(result);
+                }   
+		else 
+		{
+             	console.error(error);
+		}
+	    });
+	}
+
+	function fixspender(){
+		var e=document.getElementById("spender").value;
+		var f=document.getElementById("t2amount").value;
+		walleton.approve(e,f,function(error,result){
+            	if (!error) 
+		{
+              	alert(result);
+                }   
+		else 
+		{
+             	console.error(error);
+		}
+	    });
+	}
+
+	function transfer2(){
+		var g=document.getElementById("spen_ad").value;
+		var h=document.getElementById("rec_ad").value;	
+		var i=document.getElementById("t2amount").value;
+		walleton.transferFrom(g,h,i,function(error,result){
+            	if (!error) 
+		{
+              	alert(result);
+                }   
+		else 
+		{
+             	console.error(error);
+		}
+	    });
+	}
+
+	function spe_bal(){
+		var j=document.getElementById("spe_ad").value;
+		walleton.approve(j,function(error,result){
+            	if (!error) 
+		{
+              	alert(result);
+                }   
+		else 
+		{
+             	console.error(error);
+		}
+	    });
+	}
+		
+</script>
+</html>
