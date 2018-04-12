@@ -193,16 +193,16 @@ contract High_low
         gamers_map[_game_id]++;
         if(msg.value!=0)//for ether bet
         {
-            if(broker_map[game_id_map_broker[_game_id]].stake_amount-(90*msg.value)/100>0)
+            if(broker_map[game_id_map_broker[_game_id]].stake_tokens*100000000000000000-(90*msg.value)/100>0)
             {
-                broker_map[game_id_map_broker[_game_id]].stake_amount-=(90*msg.value)/100;
+                broker_map[game_id_map_broker[_game_id]].stake_tokens-=(90*msg.value)/100;
             }
             else
             {
                 uint256 reduced;
-                reduced=broker_map[game_id_map_broker[_game_id]].stake_amount;
-                broker_map[game_id_map_broker[_game_id]].stake_amount=0;
-                broker_map[game_id_map_broker[_game_id]].stake_tokens-=((90*msg.value)/100 - reduced)/0.1 ether;
+                reduced=broker_map[game_id_map_broker[_game_id]].stake_tokens*100000000000000000;
+                broker_map[game_id_map_broker[_game_id]].stake_tokens=0;
+                broker_map[game_id_map_broker[_game_id]].stake_amount-=(90*msg.value)/100 - reduced;
             }
                 
             game_id_map_trader[_game_id][gamers_map[_game_id]].bet_amount=msg.value;
@@ -212,16 +212,16 @@ contract High_low
         else //for token bet
         {
             High_low_token(token).transferFrom(msg.sender,this,_bet_tokens);
-            if((broker_map[game_id_map_broker[_game_id]].stake_amount-(90*_bet_tokens*100000000000000000)/100)>0)
+            if((broker_map[game_id_map_broker[_game_id]].stake_tokens-(90*_bet_tokens)/100)>0)
             {
-                broker_map[game_id_map_broker[_game_id]].stake_amount-=(90*_bet_tokens*100000000000000000)/100;
+                broker_map[game_id_map_broker[_game_id]].stake_tokens-=(90*_bet_tokens)/100;
             }
             else
             {
-                uint256 reduced_amount;
-                reduced_amount=broker_map[game_id_map_broker[_game_id]].stake_amount;
-                broker_map[game_id_map_broker[_game_id]].stake_amount=0;
-                broker_map[game_id_map_broker[_game_id]].stake_tokens-=_bet_tokens-(reduced_amount/0.1 ether);
+                uint256 reduced_token;
+                reduced_token=broker_map[game_id_map_broker[_game_id]].stake_tokens;
+                broker_map[game_id_map_broker[_game_id]].stake_tokens=0;
+                broker_map[game_id_map_broker[_game_id]].stake_amount-=((_bet_tokens-reduced_token)*100000000000000000*90)/100;
             }
             game_id_map_trader[_game_id][gamers_map[_game_id]].betted_tokens=_bet_tokens;
             total_bet_tokens[_game_id]+=_bet_tokens;
